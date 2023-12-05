@@ -1,0 +1,5 @@
+[VPN Connection]
+name=openconnect
+service=org.freedesktop.NetworkManager.openconnect
+program=/usr/local/bin/nm-oc.py
+supports-multiple-connections=true
