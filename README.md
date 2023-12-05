@@ -68,7 +68,7 @@ following.
 [VPN Connection]
 name=openconnect
 service=org.freedesktop.NetworkManager.openconnect
-program=/usr/local/bin/networkmanager-openconnect  # Path to executable.
+program=/usr/local/bin/nm-openconnect  # Path to executable.
 supports-multiple-connections=true
 ```
 

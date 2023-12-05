@@ -257,6 +257,7 @@ def main():
     ns: Namespace = parser.parse_args()
 
     # Configure logger on start up.
+    global logger
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.INFO)
     handler = SysLogHandler(facility=SysLogHandler.LOG_DAEMON, address='/dev/log')
