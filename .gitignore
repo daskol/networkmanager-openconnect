@@ -1,0 +1,4 @@
+# Ignore package meta and data diretories.
+/build
+/dist
+*.egg-info
