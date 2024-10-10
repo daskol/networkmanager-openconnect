@@ -97,6 +97,7 @@ class Plugin(dbus.service.Object):
         self.gateway: Optional[str] = None
         self.password: Optional[str] = None
         self.username: Optional[str] = None
+        self.protocol: Optional[str] = None
         self.form_data: list[str] = []
 
     def run(self):
@@ -114,7 +115,7 @@ class Plugin(dbus.service.Object):
         cmd = [
             'openconnect', '-u', self.username, '--passwd-on-stdin',
             '--script', '/usr/lib/nm-openconnect-service-openconnect-helper',
-            '--syslog', '--protocol', 'anyconnect', *self.form_data,
+            '--syslog', '--protocol', self.protocol, *self.form_data,
             self.gateway
         ]
         logger.info('command to connect: %s', dumps(cmd, ensure_ascii=False))
@@ -147,6 +148,7 @@ class Plugin(dbus.service.Object):
         vpn = settings.get('vpn', {})
         data = vpn.get('data', {})
         self.username = data.get('username')
+        self.protocol = data.get('protocol')
         self.gateway = data.get('gateway')
 
         # Parse form data to command line terms.
