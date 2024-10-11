@@ -111,12 +111,19 @@ class Plugin(dbus.service.Object):
         connection = convert(connection)
         logger.info('nm-oc: Connect(%s)', connection)
 
+        # See original implementation for details.
+        #
+        # [1]: https://gitlab.gnome.org/GNOME/NetworkManager-openconnect/-/
+        #      blob/1.2.10/src/nm-openconnect-service.c?ref_type=tags#L496-504
+        protocol = ()
+        if self.protocol and self.protocol != 'anyconnect':
+            protocol = ('--protocol', protocol)
+
         env = {'NM_DBUS_SERVICE_OPENCONNECT': self.bus_name}  # Helper script.
         cmd = [
             'openconnect', '-u', self.username, '--passwd-on-stdin',
             '--script', '/usr/lib/nm-openconnect-service-openconnect-helper',
-            '--syslog', '--protocol', self.protocol, *self.form_data,
-            self.gateway
+            '--syslog', *protocol, *self.form_data, self.gateway
         ]
         logger.info('command to connect: %s', dumps(cmd, ensure_ascii=False))
         self.StateChanged(ServiceState.Starting)
