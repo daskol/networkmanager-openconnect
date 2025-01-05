@@ -100,6 +100,9 @@ class Plugin(dbus.service.Object):
         self.protocol: Optional[str] = None
         self.form_data: list[str] = []
 
+        self.client_cert: Optional[str] = None
+        self.server_cert: Optional[str] = None
+
     def run(self):
         self.loop.run()
 
@@ -119,11 +122,17 @@ class Plugin(dbus.service.Object):
         if self.protocol and self.protocol != 'anyconnect':
             protocol = ('--protocol', protocol)
 
+        certs = ()
+        if self.client_cert:
+            certs += ('-c', self.client_cert)
+        if self.server_cert:
+            certs += (f'--servercert={self.server_cert}',)
+
         env = {'NM_DBUS_SERVICE_OPENCONNECT': self.bus_name}  # Helper script.
         cmd = [
             'openconnect', '-u', self.username, '--passwd-on-stdin',
             '--script', '/usr/lib/nm-openconnect-service-openconnect-helper',
-            '--syslog', *protocol, *self.form_data, self.gateway
+            '--syslog', *protocol, *self.form_data, *certs, self.gateway
         ]
         logger.info('command to connect: %s', dumps(cmd, ensure_ascii=False))
         self.StateChanged(ServiceState.Starting)
@@ -165,6 +174,10 @@ class Plugin(dbus.service.Object):
                 form_data.extend(['-F', field])
         if form_data:
             self.form_data = form_data
+
+        # Client and server certificates.
+        self.client_cert = data.get('client-cert')
+        self.server_cert = data.get('server-cert')
 
         # Set or update password.
         secrets = vpn.get('secrets', {})
